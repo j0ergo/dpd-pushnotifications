@@ -63,11 +63,6 @@ Gcm.basicDashboard = {
  * Module methodes
  */
 Gcm.prototype.handle = function ( ctx, next ) {
-  
-  console.log("ctx: " + ctx);
-  console.log("ctx.req: " + ctx.req);
-  console.log("ctx.req.method: " + ctx.req.method);
-  console.log("ctx.body: " + ctx.body);
 
   if ( ctx.req && (ctx.req.method !== 'POST' || !ctx.body.registrationIds || ctx.body.registrationIds.length == 0)) {
     return next();
@@ -102,10 +97,8 @@ Gcm.prototype.handle = function ( ctx, next ) {
    */
   this.sender.send(this.message, registrationIds, 4, function (err, result) {
     if (err) {
-      console.log("an error occurred: " + err);
       ctx.done(err);
     } else {
-      console.log("result: " + result);
       ctx.done(null, result);
     }
   });
