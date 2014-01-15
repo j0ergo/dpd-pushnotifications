@@ -71,12 +71,10 @@ Gcm.prototype.handle = function ( ctx, next ) {
   var registrationIds = ctx.body.registrationIds;
 
   if (ctx.body.title) {
-    console.log("ctx.body.title: " + ctx.body.title);
-    //this.message.addData('title', ctx.body.title);
+    this.message.addData('title', ctx.body.title);
   }
   if (ctx.body.message) {
-    console.log("ctx.body.message: " + ctx.body.message);
-    //this.message.addData('message', ctx.body.message);
+    this.message.addData('message', ctx.body.message);
   }
   if (ctx.body.msgcnt) {
     this.message.addData('msgcnt', ctx.body.msgcnt);
