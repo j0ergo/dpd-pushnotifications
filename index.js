@@ -64,6 +64,11 @@ Gcm.basicDashboard = {
  */
 Gcm.prototype.handle = function ( ctx, next ) {
   
+  console.log("ctx: " + ctx);
+  console.log("ctx.req: " + ctx.req);
+  console.log("ctx.req.method: " + ctx.req.method);
+  console.log("ctx.body: " + ctx.body);
+
   if ( ctx.req && (ctx.req.method !== 'POST' || !ctx.body.registrationIds || ctx.body.registrationIds.length == 0)) {
     return next();
   }
