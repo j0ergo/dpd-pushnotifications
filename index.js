@@ -17,17 +17,6 @@ function Gcm( options ) {
 
   // GCM API Server Key
   this.sender = new gcm.Sender(this.config.gcmApiServerKey);
-
-  // the payload data to send...
-  this.message = new gcm.Message();
-  this.message.addData('title', this.config.defaultTitle || 'Notification' );
-  this.message.addData('message',this.config.defaultMessage || 'Hi, something came up!' );
-  this.message.timeToLive = this.config.defaultTTL || 3000;
-  // other possible defaults:
-  //this.message.addData('msgcnt','1');
-  //this.message.addData('soundname','beep.wav');
-  //this.message.collapseKey = 'demo';
-  //this.message.delayWhileIdle = true;
 }
 
 util.inherits( Gcm, Resource );
@@ -68,34 +57,39 @@ Gcm.prototype.handle = function ( ctx, next ) {
     return next();
   }
 
-  var registrationIds = ctx.body.registrationIds;
-
+  var message = new gcm.Message();
+  message.timeToLive = this.config.defaultTTL || 3000;
   if (ctx.body.title) {
-    this.message.addData('title', ctx.body.title);
+    message.addData('title', ctx.body.title);
+  } else {
+    message.addData('title', this.config.defaultTitle || 'Notification' );
   }
   if (ctx.body.message) {
-    this.message.addData('message', ctx.body.message);
+    message.addData('message', ctx.body.message);
+  } else {
+    message.addData('message', this.config.defaultMessage || 'Hi, something came up!' );
   }
   if (ctx.body.msgcnt) {
-    this.message.addData('msgcnt', ctx.body.msgcnt);
+    message.addData('msgcnt', ctx.body.msgcnt);
   }
   if (ctx.body.soundname) {
-    this.message.addData('soundname', ctx.body.soundname);
+    message.addData('soundname', ctx.body.soundname);
   }
   if (ctx.body.collapseKey) {
-    this.message.collapseKey = ctx.body.collapseKey;
+    message.collapseKey = ctx.body.collapseKey;
   }
   if (ctx.body.delayWhileIdle) {
-    this.message.delayWhileIdle = ctx.body.delayWhileIdle;
+    message.delayWhileIdle = ctx.body.delayWhileIdle;
   }
   if (ctx.body.timeToLive) {
-    this.message.timeToLive = ctx.body.timeToLive;
+    message.timeToLive = ctx.body.timeToLive;
   }
 
+  var registrationIds = ctx.body.registrationIds;
   /**
    * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
    */
-  this.sender.send(this.message, registrationIds, 4, function (err, result) {
+  this.sender.send(message, registrationIds, 4, function (err, result) {
     if (err) {
       ctx.done(err);
     } else {
