@@ -14,15 +14,30 @@ then do
 npm install
 </pre>
 Usage in a Deployd-Event-Handler:
+For Android:
 <pre>
 dpd.pushnotifications.post({
-		registrationIds: ["...", "..."],
+		gcmRegistrationIds: ["...", "..."],
 		title: "...",
 		message: "...",
 		msgcnt: "...",
 		soundname: "...",
 		collapseKey: "...",
 		delayWhileIdle: true,
+		timeToLive: 4000
+	},
+	function (err, results) {
+    	console.log(results);
+	}
+)
+</pre>
+For iOS:
+<pre>
+dpd.pushnotifications.post({
+		apnTokens: ["...", "..."],
+		message: "...",
+		msgcnt: "...",
+		soundname: "...",
 		timeToLive: 4000
 	},
 	function (err, results) {
