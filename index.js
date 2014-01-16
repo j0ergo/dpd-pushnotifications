@@ -18,6 +18,9 @@ function Pushnotifications( options ) {
   // and https://github.com/argon/node-apn
 
   this.gcmSender = new gcm.Sender(this.config.gcmApiServerKey);
+
+  var options = { "gateway": "gateway.sandbox.push.apple.com" };
+  var apnConnection = new apn.Connection(options);
 }
 
 util.inherits( Pushnotifications, Resource );
