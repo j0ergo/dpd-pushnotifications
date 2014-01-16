@@ -14,6 +14,7 @@ then do
 npm install
 </pre>
 Usage in a Deployd-Event-Handler:
+
 For Android:
 <pre>
 dpd.pushnotifications.post({
