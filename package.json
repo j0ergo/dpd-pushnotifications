@@ -1,7 +1,8 @@
 {
-  "name": "dpd-gcm",
+  "name": "dpd-pushnotifications",
   "version": "0.0.1",
   "dependencies": {
-    "node-gcm" : "*"
+    "node-gcm" : "*",
+    "apn" : "*"
   }
 }

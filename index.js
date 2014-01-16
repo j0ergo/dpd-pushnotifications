@@ -4,25 +4,27 @@
  */
 var Resource      = require('deployd/lib/resource'),
     util          = require('util'),
-    gcm           = require('node-gcm');
+    gcm           = require('node-gcm'),
+    apn           = require('apn');
 
 /**
  * Module setup.
  */
-function Gcm( options ) {
+function Pushnotifications( options ) {
   Resource.apply(this, arguments);
 
-  // see https://github.com/ToothlessGear/node-gcm
-  // and http://devgirl.org/2013/07/17/tutorial-implement-push-notifications-in-your-phonegap-application/
+  // see https://github.com/ToothlessGear/node-gcm,
+  // http://devgirl.org/2013/07/17/tutorial-implement-push-notifications-in-your-phonegap-application/
+  // and https://github.com/argon/node-apn
 
-  this.sender = new gcm.Sender(this.config.gcmApiServerKey);
+  this.gcmSender = new gcm.Sender(this.config.gcmApiServerKey);
 }
 
-util.inherits( Gcm, Resource );
+util.inherits( Pushnotifications, Resource );
 
-Gcm.prototype.clientGeneration = true;
+Pushnotifications.prototype.clientGeneration = true;
 
-Gcm.basicDashboard = {
+Pushnotifications.basicDashboard = {
   settings: [
     {
       name        : 'gcmApiServerKey',
@@ -50,7 +52,7 @@ Gcm.basicDashboard = {
 /**
  * Module methodes
  */
-Gcm.prototype.handle = function ( ctx, next ) {
+Pushnotifications.prototype.handle = function ( ctx, next ) {
 
   if ( ctx.req && (ctx.req.method !== 'POST' || !ctx.body.registrationIds || ctx.body.registrationIds.length == 0)) {
     return next();
@@ -92,7 +94,7 @@ Gcm.prototype.handle = function ( ctx, next ) {
   /**
    * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
    */
-  this.sender.send(message, registrationIds, 4, function (err, result) {
+  this.gcmSender.send(message, registrationIds, 4, function (err, result) {
     if (err) {
       ctx.done(err);
     } else {
@@ -104,4 +106,4 @@ Gcm.prototype.handle = function ( ctx, next ) {
 /**
  * Module export
  */
-module.exports = Gcm;
+module.exports = Pushnotifications;

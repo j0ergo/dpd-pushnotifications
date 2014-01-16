@@ -1,12 +1,12 @@
-dpd-gcm
+dpd-pushnotifications
 =======
 
-A very simple Deployd Resource for connectivity to the Google Cloud Messaging (GCM)
+A very simple Deployd Resource for connectivity to the Google Cloud Messaging (GCM) and Apple Push Notification Service (APNs)
 
 Include in your package.json like
 <pre>
   "dependencies": {
-    "dpd-gcm": "git+ssh://git@github.com:ozzroach/dpd-gcm.git"
+    "dpd-pushnotifications": "git+ssh://git@github.com:ozzroach/dpd-pushnotifications.git"
   }
 </pre>
 then do
@@ -15,7 +15,7 @@ npm install
 </pre>
 Usage in a Deployd-Event-Handler:
 <pre>
-dpd.gcm.post({
+dpd.pushnotifications.post({
 		registrationIds: ["...", "..."],
 		title: "...",
 		message: "...",
