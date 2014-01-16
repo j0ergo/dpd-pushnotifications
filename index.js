@@ -20,7 +20,7 @@ function Pushnotifications( options ) {
   this.gcmSender = new gcm.Sender(this.config.gcmApiServerKey);
 
   var options = { "gateway": "gateway.sandbox.push.apple.com" };
-  var apnConnection = new apn.Connection(options);
+  this.apnConnection = new apn.Connection(options);
 }
 
 util.inherits( Pushnotifications, Resource );
@@ -57,53 +57,89 @@ Pushnotifications.basicDashboard = {
  */
 Pushnotifications.prototype.handle = function ( ctx, next ) {
 
-  if ( ctx.req && (ctx.req.method !== 'POST' || !ctx.body.registrationIds || ctx.body.registrationIds.length == 0)) {
-    return next();
-  }
+  if (ctx.body.gcmRegistrationIds) {
+    var registrationIds = ctx.body.gcmRegistrationIds;
 
-  var registrationIds = ctx.body.registrationIds;
-
-  // the payload data to send...
-  var message = new gcm.Message();
-  if (ctx.body.title) {
-    message.addData('title', ctx.body.title);
-  } else {
-    message.addData('title', this.config.defaultTitle || 'Notification' );
-  }
-  if (ctx.body.message) {
-    message.addData('message', ctx.body.message);
-  } else {
-    message.addData('message',this.config.defaultMessage || 'Hi, something came up!' );
-  }
-  if (ctx.body.timeToLive) {
-    message.timeToLive = ctx.body.timeToLive;
-  } else {
-    message.timeToLive = this.config.defaultTTL || 3000;
-  }
-
-  if (ctx.body.msgcnt) {
-    message.addData('msgcnt', ctx.body.msgcnt);
-  }
-  if (ctx.body.soundname) {
-    message.addData('soundname', ctx.body.soundname);
-  }
-  if (ctx.body.collapseKey) {
-    message.collapseKey = ctx.body.collapseKey;
-  }
-  if (ctx.body.delayWhileIdle) {
-    message.delayWhileIdle = ctx.body.delayWhileIdle;
-  }
-
-  /**
-   * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
-   */
-  this.gcmSender.send(message, registrationIds, 4, function (err, result) {
-    if (err) {
-      ctx.done(err);
+    // the payload data to send...
+    var message = new gcm.Message();
+    if (ctx.body.title) {
+      message.addData('title', ctx.body.title);
     } else {
-      ctx.done(null, result);
+      message.addData('title', this.config.defaultTitle || 'Notification' );
     }
-  });
+    if (ctx.body.message) {
+      message.addData('message', ctx.body.message);
+    } else {
+      message.addData('message',this.config.defaultMessage || 'Hi, something came up!' );
+    }
+    if (ctx.body.timeToLive) {
+      message.timeToLive = ctx.body.timeToLive;
+    } else {
+      message.timeToLive = this.config.defaultTTL || 3000;
+    }
+
+    if (ctx.body.msgcnt) {
+      message.addData('msgcnt', ctx.body.msgcnt);
+    }
+    if (ctx.body.soundname) {
+      message.addData('soundname', ctx.body.soundname);
+    }
+    if (ctx.body.collapseKey) {
+      message.collapseKey = ctx.body.collapseKey;
+    }
+    if (ctx.body.delayWhileIdle) {
+      message.delayWhileIdle = ctx.body.delayWhileIdle;
+    }
+
+    /**
+     * Parameters: message-literal, registrationIds-array, No. of retries, callback-function
+     */
+    this.gcmSender.send(message, registrationIds, 4, function (err, result) {
+      if (err) {
+        ctx.done(err);
+      } else {
+        ctx.done(null, result);
+      }
+    });
+  }
+
+  if (ctx.body.apnTokens) {
+    var index = 0,
+        token = "",
+        device = {},
+        note = {};
+    for (; index < ctx.body.apnTokens.length; index++) {
+      token = ctx.body.apnTokens[index];
+      device = new apn.Device(token);
+      note = new apn.Notification();
+
+      if (ctx.body.timeToLive) {
+        note.expiry = ctx.body.timeToLive;
+      } else {
+        note.expiry = this.config.defaultTTL || 3000;
+      }
+
+      if (ctx.body.msgcnt) {
+        note.badge = ctx.body.msgcnt;
+      } else {
+        note.badge = 1;
+      }
+
+      if (ctx.body.soundname) {
+        note.sound = ctx.body.soundname;
+      }
+
+      if (ctx.body.message) {
+        note.alert = ctx.body.message;
+      } else {
+        note.alert = this.config.defaultMessage || 'Hi, something came up!';
+      }
+      //note.payload = {'messageFrom': 'Caroline'};
+
+      this.apnConnection.pushNotification(note, device);
+    }
+  }
+
 };
 
 /**
