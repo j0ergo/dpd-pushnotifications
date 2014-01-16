@@ -19,7 +19,11 @@ function Pushnotifications( options ) {
 
   this.gcmSender = new gcm.Sender(this.config.gcmApiServerKey);
 
-  var options = { "gateway": "gateway.sandbox.push.apple.com" };
+  var options = {
+    "gateway": "gateway.sandbox.push.apple.com",
+    "cert": (this.config.certPemLocation || "../../config/cert.pem"),
+    "key": (this.config.keyPemLocation || "../../config/key.pem")
+  };
   console.log(__dirname);
   this.apnConnection = new apn.Connection(options);
 }
