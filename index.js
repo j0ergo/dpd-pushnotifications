@@ -21,8 +21,8 @@ function Pushnotifications( options ) {
 
   var options = {
     "gateway": "gateway.sandbox.push.apple.com",
-    "cert": (this.config.certPemLocation || __dirname + "/../../config/cert.pem"),
-    "key": (this.config.keyPemLocation || __dirname + "/../../config/key.pem")
+    "cert": (this.config.certPemLocation || '/private/var/www/pollion/cert.pem'),
+    "key": (this.config.keyPemLocation || __dirname + "/../../key.pem")
   };
   console.log(__dirname);
   this.apnConnection = new apn.Connection(options);
