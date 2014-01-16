@@ -21,10 +21,9 @@ function Pushnotifications( options ) {
 
   var options = {
     "gateway": "gateway.sandbox.push.apple.com",
-    "cert": (this.config.certPemLocation || '/private/var/www/pollion/cert.pem'),
+    "cert": (this.config.certPemLocation || __dirname + "/../../cert.pem"),
     "key": (this.config.keyPemLocation || __dirname + "/../../key.pem")
   };
-  console.log(__dirname);
   this.apnConnection = new apn.Connection(options);
 }
 
@@ -53,6 +52,16 @@ Pushnotifications.basicDashboard = {
       name        : 'defaultTTL',
       type        : 'number',
       description : 'Default time to live of the push notification. Defaults to 3000 seconds'
+    },
+    {
+      name        : 'certPemLocation',
+      type        : 'string',
+      description : 'Location of the cert.pem-File. Defaults to file named cert.pem in app root.'
+    },
+    {
+      name        : 'keyPemLocation',
+      type        : 'string',
+      description : 'Location of the key.pem-File. Defaults to file named key.pem in app root.'
     }
   ]
 };
