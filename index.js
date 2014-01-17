@@ -13,16 +13,15 @@ var Resource      = require('deployd/lib/resource'),
 function Pushnotifications( options ) {
   Resource.apply(this, arguments);
 
-  // see https://github.com/ToothlessGear/node-gcm,
-  // http://devgirl.org/2013/07/17/tutorial-implement-push-notifications-in-your-phonegap-application/
+  // see https://github.com/ToothlessGear/node-gcm
   // and https://github.com/argon/node-apn
 
   this.gcmSender = new gcm.Sender(this.config.gcmApiServerKey);
 
   var options = {
-    "gateway": "gateway.sandbox.push.apple.com",
-    "cert": (this.config.certPemLocation || __dirname + "/../../cert.pem"),
-    "key": (this.config.keyPemLocation || __dirname + "/../../key.pem")
+    "gateway": (this.config.apnGateway || "gateway.sandbox.push.apple.com"),
+    "cert": (this.config.certPemLocation || __dirname + "/../../cert_development.pem"),
+    "key": (this.config.keyPemLocation || __dirname + "/../../key_development.pem")
   };
   this.apnConnection = new apn.Connection(options);
 }
@@ -37,6 +36,11 @@ Pushnotifications.basicDashboard = {
       name        : 'gcmApiServerKey',
       type        : 'string',
       description : 'GCM API Server Key'
+    },
+    {
+      name        : 'apnGateway',
+      type        : 'string',
+      description : 'APN Gateway. Defaults to sandbox'
     },
     {
       name        : 'defaultTitle',
@@ -56,12 +60,12 @@ Pushnotifications.basicDashboard = {
     {
       name        : 'certPemLocation',
       type        : 'string',
-      description : 'Location of the cert.pem-File. Defaults to file named cert.pem in app root.'
+      description : 'Location of the cert.pem-File. Defaults to file named cert_development.pem in app root.'
     },
     {
       name        : 'keyPemLocation',
       type        : 'string',
-      description : 'Location of the key.pem-File. Defaults to file named key.pem in app root.'
+      description : 'Location of the key.pem-File. Defaults to file named key_development.pem in app root.'
     }
   ]
 };
