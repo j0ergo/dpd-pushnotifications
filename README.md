@@ -13,7 +13,13 @@ then do
 <pre>
 npm install
 </pre>
-Usage in a Deployd-Event-Handler:
+
+##Configuration
+
+For iOS Push Notifications, node-apn (https://github.com/argon/node-apn) needs a key.pem and a cert.pem. It is assumed, that these files are located in ./config of the Deployd application.
+
+
+##Usage in a Deployd-Event-Handler:
 
 For Android:
 <pre>

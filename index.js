@@ -20,8 +20,8 @@ function Pushnotifications( options ) {
 
   var options = {
     "gateway": (this.config.apnGateway || "gateway.sandbox.push.apple.com"),
-    "cert": (this.config.certPemLocation || __dirname + "/../../cert_development.pem"),
-    "key": (this.config.keyPemLocation || __dirname + "/../../key_development.pem")
+    "cert": (this.config.certPemLocation || __dirname + "/../../config/cert.pem"),
+    "key": (this.config.keyPemLocation || __dirname + "/../../config/key.pem")
   };
   this.apnConnection = new apn.Connection(options);
 }
@@ -60,12 +60,12 @@ Pushnotifications.basicDashboard = {
     {
       name        : 'certPemLocation',
       type        : 'string',
-      description : 'Location of the cert.pem-File. Defaults to file named cert_development.pem in app root.'
+      description : 'Location of the cert.pem-File. Defaults to file named cert.pem in the config-directory of the app.'
     },
     {
       name        : 'keyPemLocation',
       type        : 'string',
-      description : 'Location of the key.pem-File. Defaults to file named key_development.pem in app root.'
+      description : 'Location of the key.pem-File. Defaults to file named key.pem in the config-directory of the app.'
     }
   ]
 };
