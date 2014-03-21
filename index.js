@@ -35,7 +35,7 @@ function Pushnotifications( options ) {
   }
   connectionString += (process.env.MONGO_DB_HOST || '127.0.0.1');
   if (process.env.MONGO_DB_PORT) {
-    connectionString += process.env.MONGO_DB_PORT;
+    connectionString += ":" + process.env.MONGO_DB_PORT;
   }
   connectionString += "/";
   if (process.env.MONGO_DB_NAME) {
@@ -108,6 +108,16 @@ Pushnotifications.basicDashboard = {
       name        : 'keyPemLocation',
       type        : 'string',
       description : 'Location of the key.pem-File. Defaults to file named key.pem in the config-directory of the app.'
+    },
+    {
+      name        : "developmentDbName",
+      type        : 'string',
+      description : 'Name of the MongoDB in development environment.'
+    },
+    {
+      name        : "productionDbName",
+      type        : 'string',
+      description : 'Name of the MongoDB in production environment.'
     }
   ]
 };
