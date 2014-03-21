@@ -57,7 +57,7 @@ function Pushnotifications( options ) {
         registrationIds: Array,
         apnToken: String
     });
-    this.pushNotificationModel = mongoose.model('PushNotification', this.pushNotificationSchema);
+    this.pushNotificationModel = mongoose.model('PersistedPushNotification', this.pushNotificationSchema);
     this.pushNotificationModel.find(function (err, pushNotifications) {
       if (err) return console.error(err);
       console.log(pushNotifications);
