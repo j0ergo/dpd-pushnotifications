@@ -2,11 +2,19 @@
 /**
  * Module dependencies
  */
-var Resource      = require('deployd/lib/resource'),
-    util          = require('util'),
-    mongoose      = require('mongoose'),
-    gcm           = require('node-gcm'),
-    apn           = require('apn');
+var Resource = require('deployd/lib/resource'),
+    util     = require('util'),
+    mongoose = require('mongoose'),
+    gcm      = require('node-gcm'),
+    apn      = require('apn');
+
+
+mongoose.model('PushNotification', new mongoose.Schema{
+  title: String,
+  message: String,
+  registrationIds: Array,
+  apnToken: String
+});
 
 /**
  * Module setup.
@@ -35,7 +43,7 @@ function Pushnotifications( options ) {
   }
   connectionString += (process.env.MONGO_DB_HOST || '127.0.0.1');
   if (process.env.MONGO_DB_PORT) {
-    connectionString += ":" + Number(process.env.MONGO_DB_PORT)+1;
+    connectionString += ":" + Number(process.env.MONGO_DB_PORT);
   }
   connectionString += "/";
   if (process.env.MONGO_DB_NAME) {
@@ -51,13 +59,7 @@ function Pushnotifications( options ) {
   var db = mongoose.createConnection(connectionString);
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
-    this.pushNotificationSchema = mongoose.Schema({
-        title: String,
-        message: String,
-        registrationIds: Array,
-        apnToken: String
-    });
-    this.pushNotificationModel = mongoose.model('PersistedPushNotification', this.pushNotificationSchema);
+    this.pushNotificationModel = db.model('PushNotification');
     this.pushNotificationModel.find(function (err, pushNotifications) {
       if (err) return console.error(err);
       console.log(pushNotifications);
