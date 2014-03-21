@@ -43,7 +43,7 @@ function Pushnotifications( options ) {
   }
   connectionString += (process.env.MONGO_DB_HOST || '127.0.0.1');
   if (process.env.MONGO_DB_PORT) {
-    connectionString += ":" + Number(process.env.MONGO_DB_PORT);
+    connectionString += ":" + Number(process.env.MONGO_DB_PORT) + 1;
   }
   connectionString += "/";
   if (process.env.MONGO_DB_NAME) {
