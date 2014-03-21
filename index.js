@@ -56,13 +56,13 @@ function Pushnotifications( options ) {
     }
   }
 
-  var db = mongoose.createConnection(connectionString);
+  this.db = mongoose.createConnection(connectionString);
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
-    this.pushNotificationModel = db.model('PushNotification');
-    this.pushNotificationModel.find(function (err, pushNotifications) {
+    var PushNotification = this.db.model('PushNotification');
+    PushNotification.find(function (err, pushNotifications) {
       if (err) return console.error(err);
-      console.log(pushNotifications);
+      console.log("pushNotifications: " + pushNotifications);
     })
 
   });
@@ -179,7 +179,11 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
       }
     });
 
-    (new this.pushNotificationModel({ message: messageData, title: titleData })).save();
+    var PushNotification = this.db.model('PushNotification');
+    console.log("PushNotification: " + PushNotification);
+    var pn = new PushNotification({ message: messageData, title: titleData, registrationIds: registrationIds });
+    console.log("pn: " + pn);
+    pn.save();
   }
 
   if (ctx.body.apnTokens) {
@@ -217,7 +221,11 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
 
       this.apnConnection.pushNotification(note, device);
 
-      (new this.pushNotificationModel({ message: note.alert, apnToken: token })).save();
+      var PushNotification = this.db.model('PushNotification');
+      console.log("PushNotification: " + PushNotification);
+      var pn = new PushNotification({ message: note.alert, apnToken: token });
+      console.log("pn: " + pn);
+      pn.save();
     }
   }
 
