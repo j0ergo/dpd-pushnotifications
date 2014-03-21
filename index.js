@@ -58,16 +58,17 @@ function Pushnotifications( options ) {
 
   this.db = mongoose.createConnection(connectionString);
   this.db.on('error', console.error.bind(console, 'connection error:'));
-  /*
   this.db.once('open', function callback () {
+    console.log("this.db.model: " + this.db.model);
     var PushNotification = this.db.model('PushNotification');
+    console.log("PushNotification: " + PushNotification);
+    /*
     PushNotification.find(function (err, pushNotifications) {
       if (err) return console.error(err);
       console.log("pushNotifications: " + pushNotifications);
     })
-
+    */
   });
-  */
 }
 
 util.inherits( Pushnotifications, Resource );
