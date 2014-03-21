@@ -48,9 +48,7 @@ function Pushnotifications( options ) {
     }
   }
 
-  mongoose.connect(connectionString);
-
-  var db = mongoose.connection;
+  var db = mongoose.createConnection(connectionString);
   db.on('error', console.error.bind(console, 'connection error:'));
   db.once('open', function callback () {
     this.pushNotificationSchema = mongoose.Schema({
