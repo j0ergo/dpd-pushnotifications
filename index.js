@@ -57,8 +57,8 @@ function Pushnotifications( options ) {
   }
 
   this.db = mongoose.createConnection(connectionString);
-  db.on('error', console.error.bind(console, 'connection error:'));
-  db.once('open', function callback () {
+  this.db.on('error', console.error.bind(console, 'connection error:'));
+  this.db.once('open', function callback () {
     var PushNotification = this.db.model('PushNotification');
     PushNotification.find(function (err, pushNotifications) {
       if (err) return console.error(err);
