@@ -9,12 +9,12 @@ var Resource = require('deployd/lib/resource'),
     apn      = require('apn');
 
 
-mongoose.model('PushNotification', new mongoose.Schema{
+mongoose.model('PushNotification', new mongoose.Schema({
   title: String,
   message: String,
   registrationIds: Array,
   apnToken: String
-});
+}));
 
 /**
  * Module setup.
