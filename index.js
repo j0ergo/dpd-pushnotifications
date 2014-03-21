@@ -4,6 +4,7 @@
  */
 var Resource      = require('deployd/lib/resource'),
     util          = require('util'),
+    mongoose      = require('mongoose'),
     gcm           = require('node-gcm'),
     apn           = require('apn');
 
@@ -24,6 +25,47 @@ function Pushnotifications( options ) {
     "key": (this.config.keyPemLocation || __dirname + "/../../config/key.pem")
   };
   this.apnConnection = new apn.Connection(options);
+
+
+  // mongodb connection string
+
+  var connectionString = "mongodb://"
+  if (process.env.MONGO_DB_USERNAME && process.env.MONGO_DB_PASSWORD) {
+    connectionString += (process.env.MONGO_DB_USERNAME + ":" + process.env.MONGO_DB_PASSWORD + "@");
+  }
+  connectionString += (process.env.MONGO_DB_HOST || '127.0.0.1');
+  if (process.env.MONGO_DB_PORT) {
+    connectionString += process.env.MONGO_DB_PORT;
+  }
+  connectionString += "/";
+  if (process.env.MONGO_DB_NAME) {
+      connectionString += process.env.MONGO_DB_NAME;
+  } else {
+    if (process.env.NODE_ENV === 'development') {
+      connectionString += this.config.developmentDbName;
+    } else {
+      connectionString += this.config.productionDbName;
+    }
+  }
+
+  mongoose.connect(connectionString);
+
+  var db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+  db.once('open', function callback () {
+    this.pushNotificationSchema = mongoose.Schema({
+        title: String,
+        message: String,
+        registrationIds: Array,
+        apnToken: String
+    });
+    this.pushNotificationModel = mongoose.model('PushNotification', this.pushNotificationSchema);
+    this.pushNotificationModel.find(function (err, pushNotifications) {
+      if (err) return console.error(err);
+      console.log(pushNotifications);
+    })
+
+  });
 }
 
 util.inherits( Pushnotifications, Resource );
@@ -80,16 +122,23 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
 
     // the payload data to send...
     var message = new gcm.Message();
+
+    var titleData;
     if (ctx.body.title) {
-      message.addData('title', ctx.body.title);
+      titleData = ctx.body.title;
     } else {
-      message.addData('title', this.config.defaultTitle || 'Notification' );
+      titleData = this.config.defaultTitle || 'Notification';
     }
+    message.addData('title', titleData);
+
+    var messageData;
     if (ctx.body.message) {
-      message.addData('message', ctx.body.message);
+      messageData = ctx.body.message;
     } else {
-      message.addData('message',this.config.defaultMessage || 'Hi, something came up!' );
+      messageData = this.config.defaultMessage || 'Hi, something came up!';
     }
+    message.addData('message', messageData);
+
     if (ctx.body.timeToLive) {
       message.timeToLive = ctx.body.timeToLive;
     } else {
@@ -119,6 +168,8 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
         ctx.done(null, result);
       }
     });
+
+    (new this.pushNotificationModel({ message: messageData, title: titleData })).save();
   }
 
   if (ctx.body.apnTokens) {
@@ -155,6 +206,8 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
       //note.payload = {'messageFrom': 'Caroline'};
 
       this.apnConnection.pushNotification(note, device);
+
+      (new this.pushNotificationModel({ message: note.alert, apnToken: token })).save();
     }
   }
 
