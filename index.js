@@ -181,11 +181,15 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
       }
     });
 
-    var PushNotification = this.db.model('PushNotification');
-    console.log("PushNotification: " + PushNotification);
-    var pn = new PushNotification({ message: messageData, title: titleData, registrationIds: registrationIds });
-    console.log("pn: " + pn);
-    pn.save();
+    try {
+      var PushNotification = this.db.model('PushNotification');
+      console.log("PushNotification: " + PushNotification);
+      var pn = new PushNotification({ message: messageData, title: titleData, registrationIds: registrationIds });
+      console.log("pn: " + pn);
+      pn.save();
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   if (ctx.body.apnTokens) {
@@ -223,11 +227,15 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
 
       this.apnConnection.pushNotification(note, device);
 
-      var PushNotification = this.db.model('PushNotification');
-      console.log("PushNotification: " + PushNotification);
-      var pn = new PushNotification({ message: note.alert, apnToken: token });
-      console.log("pn: " + pn);
-      pn.save();
+      try {
+        var PushNotification = this.db.model('PushNotification');
+        console.log("PushNotification: " + PushNotification);
+        var pn = new PushNotification({ message: note.alert, apnToken: token });
+        console.log("pn: " + pn);
+        pn.save();
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
 
