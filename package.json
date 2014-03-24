@@ -3,7 +3,6 @@
   "version": "0.0.2",
   "dependencies": {
     "node-gcm" : "*",
-    "apn" : "*",
-    "mongoose": "*"
+    "apn" : "*"
   }
 }
