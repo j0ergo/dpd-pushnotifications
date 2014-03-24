@@ -2,19 +2,10 @@
 /**
  * Module dependencies
  */
-var Resource = require('deployd/lib/resource'),
-    util     = require('util'),
-    mongoose = require('mongoose'),
-    gcm      = require('node-gcm'),
-    apn      = require('apn');
-
-
-mongoose.model('PushNotification', new mongoose.Schema({
-  title: String,
-  message: String,
-  registrationIds: Array,
-  apnToken: String
-}));
+var Resource      = require('deployd/lib/resource'),
+    util          = require('util'),
+    gcm           = require('node-gcm'),
+    apn           = require('apn');
 
 /**
  * Module setup.
@@ -33,42 +24,6 @@ function Pushnotifications( options ) {
     "key": (this.config.keyPemLocation || __dirname + "/../../config/key.pem")
   };
   this.apnConnection = new apn.Connection(options);
-
-
-  // mongodb connection string
-
-  var connectionString = "mongodb://"
-  if (process.env.MONGO_DB_USERNAME && process.env.MONGO_DB_PASSWORD) {
-    connectionString += (process.env.MONGO_DB_USERNAME + ":" + process.env.MONGO_DB_PASSWORD + "@");
-  }
-  connectionString += (process.env.MONGO_DB_HOST || '127.0.0.1');
-  if (process.env.MONGO_DB_PORT) {
-    connectionString += ":" + (Number(process.env.MONGO_DB_PORT) + 1);
-  }
-  connectionString += "/";
-  if (process.env.MONGO_DB_NAME) {
-      connectionString += process.env.MONGO_DB_NAME;
-  } else {
-    if (process.env.NODE_ENV === 'development') {
-      connectionString += this.config.developmentDbName;
-    } else {
-      connectionString += this.config.productionDbName;
-    }
-  }
-
-  this.db = mongoose.createConnection(connectionString);
-  this.db.on('error', console.error.bind(console, 'connection error:'));
-  this.db.once('open', function callback () {
-    console.log("this.db.model: " + this.db.model);
-    var PushNotification = this.db.model('PushNotification');
-    console.log("PushNotification: " + PushNotification);
-    /*
-    PushNotification.find(function (err, pushNotifications) {
-      if (err) return console.error(err);
-      console.log("pushNotifications: " + pushNotifications);
-    })
-    */
-  });
 }
 
 util.inherits( Pushnotifications, Resource );
@@ -111,16 +66,6 @@ Pushnotifications.basicDashboard = {
       name        : 'keyPemLocation',
       type        : 'string',
       description : 'Location of the key.pem-File. Defaults to file named key.pem in the config-directory of the app.'
-    },
-    {
-      name        : "developmentDbName",
-      type        : 'string',
-      description : 'Name of the MongoDB in development environment.'
-    },
-    {
-      name        : "productionDbName",
-      type        : 'string',
-      description : 'Name of the MongoDB in production environment.'
     }
   ]
 };
@@ -135,23 +80,16 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
 
     // the payload data to send...
     var message = new gcm.Message();
-
-    var titleData;
     if (ctx.body.title) {
-      titleData = ctx.body.title;
+      message.addData('title', ctx.body.title);
     } else {
-      titleData = this.config.defaultTitle || 'Notification';
+      message.addData('title', this.config.defaultTitle || 'Notification' );
     }
-    message.addData('title', titleData);
-
-    var messageData;
     if (ctx.body.message) {
-      messageData = ctx.body.message;
+      message.addData('message', ctx.body.message);
     } else {
-      messageData = this.config.defaultMessage || 'Hi, something came up!';
+      message.addData('message',this.config.defaultMessage || 'Hi, something came up!' );
     }
-    message.addData('message', messageData);
-
     if (ctx.body.timeToLive) {
       message.timeToLive = ctx.body.timeToLive;
     } else {
@@ -181,16 +119,6 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
         ctx.done(null, result);
       }
     });
-
-    try {
-      var PushNotification = this.db.model('PushNotification');
-      console.log("PushNotification: " + PushNotification);
-      var pn = new PushNotification({ message: messageData, title: titleData, registrationIds: registrationIds });
-      console.log("pn: " + pn);
-      pn.save();
-    } catch (e) {
-      console.log(e);
-    }
   }
 
   if (ctx.body.apnTokens) {
@@ -227,16 +155,6 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
       //note.payload = {'messageFrom': 'Caroline'};
 
       this.apnConnection.pushNotification(note, device);
-
-      try {
-        var PushNotification = this.db.model('PushNotification');
-        console.log("PushNotification: " + PushNotification);
-        var pn = new PushNotification({ message: note.alert, apnToken: token });
-        console.log("pn: " + pn);
-        pn.save();
-      } catch (e) {
-        console.log(e);
-      }
     }
   }
 
