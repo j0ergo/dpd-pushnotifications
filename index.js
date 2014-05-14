@@ -75,7 +75,7 @@ Pushnotifications.basicDashboard = {
  */
 Pushnotifications.prototype.handle = function ( ctx, next ) {
 
-  if (ctx.body.gcmRegistrationIds) {
+  if (ctx.body && ctx.body.gcmRegistrationIds && Array.isArray(ctx.body.gcmRegistrationIds) && ctx.body.gcmRegistrationIds.length > 0) {
     var registrationIds = ctx.body.gcmRegistrationIds;
 
     // the payload data to send...
@@ -121,7 +121,7 @@ Pushnotifications.prototype.handle = function ( ctx, next ) {
     });
   }
 
-  if (ctx.body.apnTokens) {
+  if (ctx.body && ctx.body.apnTokens && Array.isArray(ctx.body.apnTokens) && ctx.body.apnTokens.length > 0) {
     var index = 0,
         token = "",
         device = {},
